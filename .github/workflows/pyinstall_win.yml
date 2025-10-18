@@ -84,7 +84,7 @@ jobs:
           pip install -r requirements.txt pyinstaller
       - name: Build for ${{ matrix.TARGET }}
         run: |
-          pyinstaller src/cli.py --name hello-world
+          pyinstaller main.py --name hello-world
       - name: Package .zip for ${{ matrix.TARGET }}
         run: ${{ matrix.CMD_ZIP }}
       - name: Load previously uploaded release URL
