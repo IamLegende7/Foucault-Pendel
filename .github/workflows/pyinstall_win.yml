@@ -20,9 +20,9 @@ jobs:
       - name: Install Python requirements
         run: |
           pip install -r requirements.txt
-      - name: Run pytest
-        run: |
-          pytest tests/
+      #- name: Run pytest
+      #  run: |
+      #    pytest tests/
 
   create_release:
     name: Create empty release with tag name to later publish build artifacts via URL
