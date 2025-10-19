@@ -1,5 +1,6 @@
 import FreeSimpleGUI as sg
 import math
+from re import sub
 
 def calculate(hours: float, latitude: float):
     delta_degrees = round((360 / 24) * math.sin(latitude) * hours, 1)
@@ -44,7 +45,14 @@ def delete_pie_slice(window):
 def main():
     sg.theme('SystemDefaultForReal')
 
-    degrees_list = [45.5, 20, 15.5]
+    degrees_list = [
+        "52,3 (KW)",
+        "52,5 (Berlin)",
+        "51,5 (London)",
+        "38,9 (Washington DC)",
+        "55,8 (Moskau)",
+        "39,9 (Peking)"
+    ]
 
     layout = [
         [   
@@ -61,8 +69,8 @@ def main():
             ]),
             sg.Column([
                 [sg.Text('')],
-                [sg.Input(key='-hoursInput-', size=(10, None))],
-                [sg.Combo(degrees_list, key='-latitudeInput-', size=(10, None))],
+                [sg.Input(key='-hoursInput-', size=(20, None))],
+                [sg.Combo(degrees_list, key='-latitudeInput-', size=(20, None))],
                 [sg.Text(key='-Output-')],
                 [sg.Text('')],
                 [sg.Text('')],
@@ -83,18 +91,30 @@ def main():
 
     draw_pie_slice(window, center=(125, 125), radius=100, slice_angle=0)
     window['-hoursInput-'].update(str("0"))
-    window['-latitudeInput-'].update(str("45.5"))
+    window['-latitudeInput-'].update(degrees_list[0])
 
     quit = False
     while not quit:
         event, values = window.read()
+        if values['-latitudeInput-'] == None:
+            latitude = 0
+        else:
+            try:
+                latitude = float(sub( "[^0-9\.]", "", str(values['-latitudeInput-'].replace(',', '.').strip()) ))
+            except:
+                latitude = 0
+                error = True
+                window['-Output-'].update('Error: lesen vom Breitengrad')
         if event == sg.WINDOW_CLOSED or event == 'Abbruch':
             quit = True
         elif event == 'Berechnen!':
-            delta_degrees = float(calculate(float(str(values['-hoursInput-']).replace(',', '.').strip()), float(str(values['-latitudeInput-']).replace(',', '.').strip())))
+            delta_degrees = float(calculate(float(str(values['-hoursInput-']).replace(',', '.').strip()), latitude))
             delete_pie_slice(window)
             draw_pie_slice(window, center=(125, 125), radius=100, slice_angle=delta_degrees)
-            window['-Output-'].update(f'ca. {delta_degrees}°')
+            if not error:
+                window['-Output-'].update(f'ca. {delta_degrees}°')
+            else:
+                error = False
 
 main()
 

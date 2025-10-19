@@ -54,25 +54,25 @@ jobs:
         include:
           - os: ubuntu-latest
             TARGET: linux
-            ARTIFACT_NAME: hello_linux.zip
+            ARTIFACT_NAME: linux.zip
             ARTIFACT_PATH: './dist/hello-world/'
             ARTIFACT_MIME: application/zip
             CMD_ZIP: |
-              (cd dist/hello-world && zip -r hello_linux.zip *)
-          - os: macos-latest
-            TARGET: macos
-            ARTIFACT_NAME: hello_macos.zip
-            ARTIFACT_PATH: './dist/hello-world/'
-            ARTIFACT_MIME: application/zip
-            CMD_ZIP: |
-              (cd dist/hello-world && zip -r hello_macos.zip *)
+              (cd dist/hello-world && zip -r linux.zip *)
+          #- os: macos-latest
+          #  TARGET: macos
+          #  ARTIFACT_NAME: hello_macos.zip
+          #  ARTIFACT_PATH: './dist/hello-world/'
+          #  ARTIFACT_MIME: application/zip
+          #  CMD_ZIP: |
+          #    (cd dist/hello-world && zip -r hello_macos.zip *)
           - os: windows-latest
             TARGET: windows
-            ARTIFACT_NAME: hello_windows.zip
+            ARTIFACT_NAME: windows.zip
             ARTIFACT_PATH: './'
             ARTIFACT_MIME: application/zip
             CMD_ZIP: |
-              7z a hello_windows.zip .\dist\hello-world\*
+              7z a windows.zip .\dist\hello-world\*
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
