@@ -1,0 +1,85 @@
+name: Release_macos
+
+on:
+  push:
+    tags:
+      - 'mac:v*' 
+
+jobs:
+
+create_release:
+    name: Create empty release with tag name to later publish build artifacts via URL
+    needs: unit_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create empty release with tag name
+        id: create_empty_release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+      - name: Copy release URL for later uploads
+        run: |
+          echo "${{ steps.create_empty_release.outputs.upload_url }}" > release_url.txt
+      - name: Save release URL for later uploads
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_url
+          path: release_url.txt
+
+build_and_publish:
+    name: Build and publish executable applications for multiple OSs
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            TARGET: macos
+            ARTIFACT_NAME: hello_macos.zip
+            ARTIFACT_PATH: './dist/main-dir/'
+            ARTIFACT_MIME: application/zip
+            CMD_ZIP: |
+              (cd dist/main-dir && zip -r macos.zip *)
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || echo "Homebrew already installed"
+      - name: Install gettext
+        run: brew install gettext
+      - name: Link gettext
+        run: brew link --force gettext
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+      - name: Install Python requirements
+        run: |
+          pip install -r requirements.txt pyinstaller
+      - name: Build for ${{ matrix.TARGET }}
+        run: |
+          pyinstaller main.py --name main-dir
+      - name: Package .zip for ${{ matrix.TARGET }}
+        run: ${{ matrix.CMD_ZIP }}
+      - name: Load previously uploaded release URL
+        uses: actions/download-artifact@v4
+        with:
+          name: release_url
+      - name: Get release URL
+        id: get_release_details
+        shell: bash
+        run: |
+          url=`cat release_url.txt`
+          echo ::set-output name=upload_url::$url
+      - name: Publish release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_details.outputs.upload_url }}
+          asset_name: ${{ matrix.ARTIFACT_NAME }}
+          asset_path: ${{ matrix.ARTIFACT_PATH }}${{ matrix.ARTIFACT_NAME }}
+          asset_content_type: ${{ matrix.ARTIFACT_MIME }}
