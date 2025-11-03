@@ -96,6 +96,7 @@ def main():
     quit = False
     while not quit:
         event, values = window.read()
+        error = False
         if values['-latitudeInput-'] == None:
             latitude = 0
         else:
