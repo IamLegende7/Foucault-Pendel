@@ -111,7 +111,7 @@ jobs:
         include:
           - os: macos-13
             TARGET: macos
-            ARTIFACT_NAME: hello_macos.zip
+            ARTIFACT_NAME: macos.zip
             ARTIFACT_PATH: './dist/main-dir/'
             ARTIFACT_MIME: application/zip
             CMD_ZIP: |
