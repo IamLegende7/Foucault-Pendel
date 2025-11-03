@@ -59,13 +59,6 @@ jobs:
             ARTIFACT_MIME: application/zip
             CMD_ZIP: |
               (cd dist/main-dir && zip -r linux.zip *)
-          - os: macos-latest
-            TARGET: macos
-            ARTIFACT_NAME: hello_macos.zip
-            ARTIFACT_PATH: './dist/main-dir/'
-            ARTIFACT_MIME: application/zip
-            CMD_ZIP: |
-              (cd dist/main-dir && zip -r macos.zip *)
           - os: windows-latest
             TARGET: windows
             ARTIFACT_NAME: windows.zip
@@ -109,14 +102,14 @@ jobs:
           asset_content_type: ${{ matrix.ARTIFACT_MIME }}
 
   build_and_publish_macos:
-    name: Build and publish executable applications for multiple OSs
+    name: Build and publish executable applications for MacOS
     needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-13
             TARGET: macos
             ARTIFACT_NAME: hello_macos.zip
             ARTIFACT_PATH: './dist/main-dir/'
