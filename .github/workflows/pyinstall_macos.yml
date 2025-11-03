@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-create_release:
+  create_release:
     name: Create empty release with tag name to later publish build artifacts via URL
     needs: unit_test
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ create_release:
           name: release_url
           path: release_url.txt
 
-build_and_publish:
+  build_and_publish:
     name: Build and publish executable applications for multiple OSs
     needs: create_release
     runs-on: ${{ matrix.os }}
